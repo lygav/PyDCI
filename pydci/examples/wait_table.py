@@ -1,4 +1,4 @@
-from DCI import *
+from pydci import *
 
 class CleanTable(Context):
     class Waiter(StageProp):

@@ -1,4 +1,4 @@
-from DCI import Role, Context
+from pydci import Role, Context
 
 
 class Account(object):

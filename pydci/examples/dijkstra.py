@@ -1,4 +1,4 @@
-from DCI import *
+from pydci import *
 from collections import namedtuple
 
 infinity = float('inf')
@@ -47,7 +47,7 @@ class ManhattanGeometry(object):
 
 
 ##################################
-######## DCI INTERACTION #########
+######## pydci INTERACTION #########
 ##################################
 
 class CalculateShortestPath(Context):

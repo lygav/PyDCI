@@ -1,5 +1,6 @@
 import inspect
 
+__all__ = ['Role', 'Context', 'StageProp']
 
 def _proxy_getattr(self, attr):
     if attr == 'context':
