@@ -21,7 +21,7 @@ class WaitTable(Context):
             CleanTable(waiter=self).clean()
             print("{} waiting table".format(self.name))
 
-    class Apprentice(Role):
+    class Apprentice(StageProp):
         def watch_and_learn(self):
             print("{} started watching {}".format(self.name, self.context.Waiter.name))
 
