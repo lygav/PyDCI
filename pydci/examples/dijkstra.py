@@ -42,9 +42,6 @@ class ManhattanGeometry(object):
     def destination(self):
         pass
 
-    def nodes(self):
-        return self.nodes
-
 
 ##################################
 ######## pydci INTERACTION #########
@@ -67,12 +64,6 @@ class CalculateShortestPath(Context):
 
         def distance_between(self, a, b):
             return self.distances[Edge(a, b)]
-
-        def next_down_the_street_from(self, x):
-            return self.east_neighbor_of(x)
-
-        def next_along_the_avenue_from(self, x):
-            return self.south_neighbor_of(x)
 
         def nearest_unvisited_node_to_target(self):
             minimum = infinity
