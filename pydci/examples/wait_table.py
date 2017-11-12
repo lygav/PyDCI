@@ -18,15 +18,17 @@ class WaitTable(Context):
     class Waiter(Role):
         def wait_table(self):
             self.context.Apprentice.watch_and_learn()
-            CleanTable(waiter=self).clean()
+            self.wait_for_clients_to_finish()
             print("{} waiting table".format(self.name))
+
+        def wait_for_clients_to_finish(self):
+            CleanTable(waiter=self).clean()
 
     class Apprentice(StageProp):
         def watch_and_learn(self):
             print("{} started watching {}".format(self.name, self.context.Waiter.name))
 
     def __init__(self, waiter, apprentice):
-        print('wait table init')
         self.Waiter = waiter
         self.Apprentice = apprentice
 
@@ -41,7 +43,7 @@ class Person(object):
         self.name = name
 
 
-p = Person('Vladi')
-apprentice = Person('Jenny')
+p = Person('Bob')
+apprentice = Person('Alice')
 wt = WaitTable(p, apprentice)
 wt.start()
