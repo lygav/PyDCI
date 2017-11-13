@@ -1,4 +1,5 @@
 import inspect
+from functools import wraps
 
 __all__ = ['Role', 'Context', 'StageProp']
 
@@ -7,7 +8,29 @@ def _role_hash(self):
     return self.__ob__.__hash__()
 
 
+def interceptor(fn, wrapped_name):
+    @wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        if hasattr(self.__ob__, wrapped_name):
+            print(
+                "WARNING: Both {!r} and {!r} classes contain same method {!r}. This can lead to unexpected behaviour.".format(
+                    self.__class__.__name__, self.__ob__.__class__.__name__, wrapped_name))
+        return fn(self, *args, **kwargs)
+    wrapper.wrapped = True
+    return wrapper
+
+
+# class RoleMeta(type):
+#     def __new__(meta, name, bases, namespace, **kwargs):
+#         default = {'__getattr__', '__metaclass__'}.union(type.__dict__.keys())
+#         for n, m in namespace.items():
+#             if (inspect.ismethod(m) or inspect.isfunction(m)) and n not in default:
+#                 namespace[n] = interceptor(m, n)
+#         return type.__new__(meta, name, bases, namespace, **kwargs)
+
+
 class Role(object):
+
     @property
     def context(self):
         """
@@ -15,18 +38,27 @@ class Role(object):
         """
         return self.context
 
-    def __new__(cls, ob, ctx, **kwargs):
+    def __new__(cls, ob, ctx=None, **kwargs):
         ob = ob.__ob__ if (isinstance(ob, Role) or isinstance(ob, StageProp)) else ob
         members = dict(__ob__=ob, context=ctx)
+
+        namespace = dict()
+        default = {'__getattr__', '__metaclass__'}.union(type.__dict__.keys())
+        for n, m in inspect.getmembers(cls):
+            if (inspect.ismethod(m) or inspect.isfunction(m)) and n not in default:
+                namespace[n] = interceptor(m, n)
+        role_base = type.__new__(type, cls.__name__, (cls, ), namespace)
+
         c = type("{} as {}.{}".format(ob.__class__.__name__, cls.__module__, cls.__name__),
-                 (cls, ob.__class__),
+                 (role_base, ob.__class__),
                  members)
+
         i = object.__new__(c)
         if hasattr(ob, '__dict__'):
             i.__dict__ = ob.__dict__
         return i
 
-    def __init__(self, ob, ctx):
+    def __init__(self, ob, ctx=None):
         pass
 
     __hash__ = _role_hash
@@ -57,12 +89,24 @@ class StageProp(object):
     def __new__(cls, ob, ctx, **kwargs):
         ob = ob.__ob__ if (isinstance(ob, Role) or isinstance(ob, StageProp)) else ob
         members = dict(__ob__=ob, context=ctx)
+
+        namespace = dict()
+        default = {'__getattr__', '__metaclass__'}.union(type.__dict__.keys())
+        for n, m in inspect.getmembers(cls):
+            if (inspect.ismethod(m) or inspect.isfunction(m)) and n not in default:
+                namespace[n] = interceptor(m, n)
+        role_base = type.__new__(type, cls.__name__, (cls,), namespace)
+
         c = type("{} as {}.{}".format(ob.__class__.__name__, cls.__module__, cls.__name__),
-                 (cls, ob.__class__),
+                 (role_base, ob.__class__),
                  members)
+
         i = object.__new__(c)
         if hasattr(ob, '__dict__'):
             super(StageProp, i).__setattr__('__dict__', ob.__dict__)
+
+        # for name, fn in inspect.getmembers(i, inspect.ismethod):
+        #     print(name)
         return i
 
     def __init__(self, ob, ctx):
@@ -103,6 +147,8 @@ class Context(object):
                 roles.append((n, a))
         c = type("Context of {}.{}".format(cls.__module__, cls.__name__), (cls,), members)
         for n, r in roles:
+            # #dict([(rn, rc) for rn, rc in roles if rn != n]))
+            # wrapped = [rm[1] for rm in inspect.getmembers(r, inspect.ismethod) if hasattr(rm[1], 'wrapped')]
             setattr(c, n, RoleDescriptor(r))
         i = object.__new__(c)
         return i
