@@ -16,21 +16,12 @@ def interceptor(fn, wrapped_name):
                 "WARNING: Both {!r} and {!r} classes contain same method {!r}. This can lead to unexpected behaviour.".format(
                     self.__class__.__name__, self.__ob__.__class__.__name__, wrapped_name))
         return fn(self, *args, **kwargs)
+
     wrapper.wrapped = True
     return wrapper
 
 
-# class RoleMeta(type):
-#     def __new__(meta, name, bases, namespace, **kwargs):
-#         default = {'__getattr__', '__metaclass__'}.union(type.__dict__.keys())
-#         for n, m in namespace.items():
-#             if (inspect.ismethod(m) or inspect.isfunction(m)) and n not in default:
-#                 namespace[n] = interceptor(m, n)
-#         return type.__new__(meta, name, bases, namespace, **kwargs)
-
-
-class Role(object):
-
+class RoleBase(object):
     @property
     def context(self):
         """
@@ -47,7 +38,7 @@ class Role(object):
         for n, m in inspect.getmembers(cls):
             if (inspect.ismethod(m) or inspect.isfunction(m)) and n not in default:
                 namespace[n] = interceptor(m, n)
-        role_base = type.__new__(type, cls.__name__, (cls, ), namespace)
+        role_base = type.__new__(type, cls.__name__, (cls,), namespace)
 
         c = type("{} as {}.{}".format(ob.__class__.__name__, cls.__module__, cls.__name__),
                  (role_base, ob.__class__),
@@ -55,7 +46,7 @@ class Role(object):
 
         i = object.__new__(c)
         if hasattr(ob, '__dict__'):
-            i.__dict__ = ob.__dict__
+            super(cls.__bases__[0], i).__setattr__('__dict__', ob.__dict__)
         return i
 
     def __init__(self, ob, ctx=None):
@@ -68,6 +59,8 @@ class Role(object):
             return self.context
         return getattr(self.__ob__, attr)
 
+
+class Role(RoleBase):
     def __delattr__(self, item):
         delattr(self.__ob__, item)
 
@@ -78,47 +71,7 @@ class Role(object):
         setattr(self.__ob__, name, value)
 
 
-class StageProp(object):
-    @property
-    def context(self):
-        """
-        :return: The Context Object
-        """
-        return self.context
-
-    def __new__(cls, ob, ctx, **kwargs):
-        ob = ob.__ob__ if (isinstance(ob, Role) or isinstance(ob, StageProp)) else ob
-        members = dict(__ob__=ob, context=ctx)
-
-        namespace = dict()
-        default = {'__getattr__', '__metaclass__'}.union(type.__dict__.keys())
-        for n, m in inspect.getmembers(cls):
-            if (inspect.ismethod(m) or inspect.isfunction(m)) and n not in default:
-                namespace[n] = interceptor(m, n)
-        role_base = type.__new__(type, cls.__name__, (cls,), namespace)
-
-        c = type("{} as {}.{}".format(ob.__class__.__name__, cls.__module__, cls.__name__),
-                 (role_base, ob.__class__),
-                 members)
-
-        i = object.__new__(c)
-        if hasattr(ob, '__dict__'):
-            super(StageProp, i).__setattr__('__dict__', ob.__dict__)
-
-        # for name, fn in inspect.getmembers(i, inspect.ismethod):
-        #     print(name)
-        return i
-
-    def __init__(self, ob, ctx):
-        pass
-
-    __hash__ = _role_hash
-
-    def __getattr__(self, attr):
-        if attr == 'context':
-            return self.context
-        return getattr(self.__ob__, attr)
-
+class StageProp(RoleBase):
     def __delattr__(self, item):
         self.__setattr__(item, None)
 
