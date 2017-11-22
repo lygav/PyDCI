@@ -8,14 +8,19 @@ class Interview(Context):
         def say(self):
             print("[{}] {} Hello!".format(self.name, self.comms))
 
+    class Battle(StageProp):
+
+        @property
+        def winner(self):
+            return self.Bear
+
     class Interviewer(Role):
         def interview(self):
-            print("[Interviewer] Hello!")
-            self.context.Interviewee.say()
+            print("[Interviewer] Hello Winner!")
 
-    def __init__(self, interviewer, interviewee):
+    def __init__(self, interviewer, battle):
         self.Interviewer = interviewer
-        self.Interviewee = interviewee
+        self.Battle = battle
 
     def start(self):
         self.Interviewer.interview()
@@ -50,6 +55,7 @@ class Battle(Context):
     def start(self):
         print("Started battle of id {}".format(self.Game.id))
         self.Bear.fight()
+        Interview(Player('Interviewer', 'says'), b1).start()
         somefunc(self.Bear)
 
 
@@ -79,5 +85,3 @@ b1.start()
 b2.start()
 b3.start()
 
-Interview(Player('Interviewer', 'says'), player).start()
-Interview(Player('Interviewer', 'says'), cpu).start()

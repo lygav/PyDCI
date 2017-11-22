@@ -29,24 +29,27 @@ class RoleBase(object):
         """
         return self.context
 
-    def __new__(cls, ob, ctx=None, **kwargs):
+    def __new__(role, ob, ctx=None, **kwargs):
         ob = ob.__ob__ if (isinstance(ob, Role) or isinstance(ob, StageProp)) else ob
         members = dict(__ob__=ob, context=ctx)
 
         namespace = dict()
         default = {'__getattr__', '__metaclass__'}.union(type.__dict__.keys())
-        for n, m in inspect.getmembers(cls):
+        for n, m in inspect.getmembers(role):
             if (inspect.ismethod(m) or inspect.isfunction(m)) and n not in default:
                 namespace[n] = interceptor(m, n)
-        role_base = type.__new__(type, cls.__name__, (cls,), namespace)
+        for n, m in inspect.getmembers(ob, lambda o: isinstance(o, Role)):
+            members[n] = None
 
-        c = type("{} as {}.{}".format(ob.__class__.__name__, cls.__module__, cls.__name__),
+        role_base = type.__new__(type, role.__name__, (role,), namespace)
+
+        c = type("{} as {}.{}".format(ob.__class__.__name__, role.__module__, role.__name__),
                  (role_base, ob.__class__),
                  members)
 
         i = object.__new__(c)
         if hasattr(ob, '__dict__'):
-            super(cls.__bases__[0], i).__setattr__('__dict__', ob.__dict__)
+            super(role.__bases__[0], i).__setattr__('__dict__', ob.__dict__)
         return i
 
     def __init__(self, ob, ctx=None):
