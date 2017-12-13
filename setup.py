@@ -12,7 +12,7 @@ setup(name='pydci',
       long_description=readme(),
       classifiers=[
         'Development Status :: 4 - Beta',
-        'License :: Other/Proprietary License',
+        'License :: MIT',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
