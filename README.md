@@ -11,18 +11,18 @@ DCI specifies a program in two orthogonal projections. The DCI Data projection c
 The main goal is to reify the model in readable code. Where readable means
 code that clearly exhibits the designers intent.
 
-It's main goals are:
+### It's main goals are:
 
-Mental Models - To reflect the way different users conceptualize the objects of their world so that a program that feels like an extension of its user's mind.
+**Mental Models** - To reflect the way different users conceptualize the objects of their world so that a program that feels like an extension of its user's mind.
 
-Reasoning - To help software developers reason about system state and behavior in addition to the state and behavior of isolated objects.
+**Reasoning** - To help software developers reason about system state and behavior in addition to the state and behavior of isolated objects.
 
-Readability - To improve the readability of object-oriented code by giving system behavior first-class status.
+**Readability** - To improve the readability of object-oriented code by giving system behavior first-class status.
 
-Revision - To cleanly separate code for rapidly changing system behavior (what the system does) from code for slowly changing domain knowledge (what the system is),  
-instead of combining both in one class hierarchy. Finally, DCI can be embedded in different programming languages that are specialized for different purposes. The DCI concepts can become a unifying foundation for programming.
+**Revision** - To cleanly separate code for rapidly changing system behavior (what the system does) from code for slowly changing domain knowledge (what the system is), instead of combining both in one class hierarchy.  
+Finally, DCI can be embedded in different programming languages that are specialized for different purposes. The DCI concepts can become a unifying foundation for programming.
 
-## What is PyDCI
+## What is *PyDCI*
 
 PyDCI is a production-ready Python implementation to get you going with the DCI paradigm.  
 Start writing DCI programs **now**!
@@ -36,7 +36,5 @@ It is designed to allow you to come close enough to full DCI to be able to
 reap the huge benefits that DCI brings.
 
 
-
-Read more at:
-
+> Find more about DCI :
 http://fulloo.info/
