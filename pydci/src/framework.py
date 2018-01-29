@@ -43,9 +43,14 @@ class RoleBase(object):
 
         role_base = type.__new__(type, role.__name__, (role,), namespace)
 
-        c = type("{} as {}.{}".format(ob.__class__.__name__, role.__module__, role.__name__),
-                 (role_base, ob.__class__),
-                 members)
+        if ob is None:
+            c = type("{} as {}.{}".format(ob.__class__.__name__, role.__module__, role.__name__),
+                     (role_base, ),
+                     members)
+        else:
+            c = type("{} as {}.{}".format(ob.__class__.__name__, role.__module__, role.__name__),
+                     (role_base, ob.__class__),
+                     members)
 
         i = object.__new__(c)
         if hasattr(ob, '__dict__'):

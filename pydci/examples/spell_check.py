@@ -9,18 +9,15 @@ class SpellCheck(Context):
 
     class SpellChecker(Role):
 
-        def check(self):
-            for word in self.context.CurrentSelection.read().split(" "):
-                print("checking {}".format(word.strip()))
-                if not super(SpellCheck.SpellChecker, self).check(word):
+        def do_spellckeck(self):
+            for word in self.context.CurrentSelection.words():
+                if not self.check(word):
                     self.context.Ouput.write('The text has spelling errors \r\n')
                     suggestions = self.suggest(word)
                     if suggestions:
                         self.context.Ouput.write('Here are suggestions for `{}`: \r\n'.format(word.strip()))
-                        self.context.Ouput.write('\r\n'.join(suggestions))
+                        self.context.Ouput.write('-'.join(suggestions))
 
-        def suggest(self, word):
-            return super(SpellCheck.SpellChecker, self).suggest(word)
 
     class Ouput(Role):
         pass
@@ -31,12 +28,19 @@ class SpellCheck(Context):
         self.Ouput = output
 
     def check(self):
-        self.SpellChecker.check()
+        self.SpellChecker.do_spellckeck()
         return self.Ouput
 
 
 class TextBuffer(StringIO):
-    pass
+
+    def words(self):
+        for line in self.readlines():
+            if len(line) > 1:
+                for word in line.strip().rstrip('.,-').split(" "):
+                    yield word
+
+        self.seek(0)
 
 
 class LanguageDictionary(enchant.Dict):
@@ -54,9 +58,10 @@ buff = TextBuffer(text)
 
 dict = LanguageDictionary('en_US')
 
-spell_check = SpellCheck(buff, dict, TextBuffer())
-output = spell_check.check()
-#print(output.read())
-
+out = TextBuffer()
+spell_check = SpellCheck(buff, dict, out)
+spell_check.check()
+out.seek(0)
+print(out.read())
 
 
