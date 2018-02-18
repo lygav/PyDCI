@@ -35,7 +35,7 @@ class LibraryMembershipApplication(Context):
             self.context.Output.add_line("To apply for library membership please complete the registration.")
 
             self.context.Application.fill_details()
-            self.context.Output.add_line("Thank you for applying!")
+            self.context.Output.add_line("Thank you, your registration is complete!")
 
     class Application(StageProp):
 
