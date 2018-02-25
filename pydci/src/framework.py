@@ -31,28 +31,22 @@ class RoleBase(object):
 
     def __new__(role, ob, ctx=None, **kwargs):
         ob = ob.__ob__ if (isinstance(ob, Role) or isinstance(ob, StageProp)) else ob
-        members = dict(__ob__=ob, context=ctx)
 
-        namespace = dict()
+        namespace = dict(__ob__=ob, context=ctx)
         default = {'__getattr__', '__metaclass__'}.union(type.__dict__.keys())
         for n, m in inspect.getmembers(role):
             if (inspect.ismethod(m) or inspect.isfunction(m)) and n not in default:
                 namespace[n] = interceptor(m, n)
+        # Make sure when Context plays a Role it's internal Roles cannot be called from outside
         for n, m in inspect.getmembers(ob, lambda o: isinstance(o, Role)):
-            members[n] = None
+            namespace[n] = None
 
-        role_base = type.__new__(type, role.__name__, (role,), namespace)
+        c = type("{} as {}.{}".format(ob.__class__.__name__, role.__module__, role.__name__),
+                 (role, ) if ob is None else (role, ob.__class__,),
+                 namespace)
 
-        if ob is None:
-            c = type("{} as {}.{}".format(ob.__class__.__name__, role.__module__, role.__name__),
-                     (role_base, ),
-                     members)
-        else:
-            c = type("{} as {}.{}".format(ob.__class__.__name__, role.__module__, role.__name__),
-                     (role_base, ob.__class__),
-                     members)
+        i = super(RoleBase, c).__new__(c)
 
-        i = object.__new__(c)
         if hasattr(ob, '__dict__'):
             super(role.__bases__[0], i).__setattr__('__dict__', ob.__dict__)
         return i
@@ -108,8 +102,6 @@ class Context(object):
                 roles.append((n, a))
         c = type("Context of {}.{}".format(cls.__module__, cls.__name__), (cls,), members)
         for n, r in roles:
-            # #dict([(rn, rc) for rn, rc in roles if rn != n]))
-            # wrapped = [rm[1] for rm in inspect.getmembers(r, inspect.ismethod) if hasattr(rm[1], 'wrapped')]
             setattr(c, n, RoleDescriptor(r))
         i = object.__new__(c)
         return i

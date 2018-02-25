@@ -2,12 +2,12 @@ from setuptools import setup
 
 
 def readme():
-    with open('README.rst') as f:
+    with open('README.md') as f:
         return f.read()
 
 
 setup(name='pydci',
-      version='0.0.1',
+      version='0.0.2',
       description='PyDCI - Data Context Interaction framework for Python',
       long_description=readme(),
       classifiers=[

@@ -17,6 +17,8 @@ class Interview(Context):
     class Interviewer(Role):
         def interview(self):
             print("[Interviewer] Hello Winner!")
+            #should fail because you shouldn't call nested Contexts Roles
+            self.context.Battle.winner.say()
 
     def __init__(self, interviewer, battle):
         self.Interviewer = interviewer
