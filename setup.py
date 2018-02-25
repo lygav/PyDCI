@@ -7,7 +7,7 @@ def readme():
 
 
 setup(name='pydci',
-      version='0.0.2',
+      version='0.0.3',
       description='PyDCI - Data Context Interaction framework for Python',
       long_description=readme(),
       classifiers=[
