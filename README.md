@@ -11,20 +11,20 @@ DCI specifies a program in two orthogonal projections. The DCI Data projection c
 The main goal is to reify the model in readable code. Where readable means
 code that clearly exhibits the designers intent.
 
-### It's main goals are:
+### DCI main goals are:
 
 **Mental Models** - To reflect the way different users conceptualize the objects of their world so that a program that feels like an extension of its user's mind.
 
-**Reasoning** - To help software developers reason about system state and behavior in addition to the state and behavior of isolated objects.
+**Reasoning** - To help software developers reason about system state and behaviour in addition to the state and behaviour of isolated objects.
 
-**Readability** - To improve the readability of object-oriented code by giving system behavior first-class status.
+**Readability** - To improve the readability of object-oriented code by giving system behaviour first-class status.
 
-**Revision** - To cleanly separate code for rapidly changing system behavior (what the system does) from code for slowly changing domain knowledge (what the system is), instead of combining both in one class hierarchy.  
+**Revision** - To cleanly separate code for rapidly changing system behaviour (what the system does) from code for slowly changing domain knowledge (what the system is), instead of combining both in one class hierarchy.  
 Finally, DCI can be embedded in different programming languages that are specialized for different purposes. The DCI concepts can become a unifying foundation for programming.
 
 ## What is *PyDCI*
 
-PyDCI is a production-ready Python implementation to get you going with the DCI paradigm.  
+PyDCI is a Python implementation of DCI that gives you a framework to get you going with the DCI paradigm.
 Start writing DCI programs **now**!
 
 ## PyDCI goals
